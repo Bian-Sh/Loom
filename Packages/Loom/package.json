@@ -1,0 +1,15 @@
+{
+  "name": "com.bshsf.loom",
+  "displayName": "Loom",
+  "version": "1.0.0",
+  "unity": "2021.3",
+  "description": "Loom is a simple yet powerful Unity tool designed to simplify multithreading programming and achieve data synchronization between threads. It provides a simple and effective way for non-main threads to safely operate on Unity objects, avoiding common thread synchronization issues.",
+  "type": "library",
+  "samples":[
+    {
+      "displayName": "Example",
+      "description": "Very Simple Example",
+      "path": "Samples~/Example"
+    }
+  ]
+}
