@@ -13,8 +13,11 @@ Loom是一个强大的Unity多线程工具，旨在简化多线程编程并实�
 ## 安装和使用
 
 1. 在Unity的Package Manager中，将以下链接复制并粘贴到输入框中以完成安装：``https://github.com/Bian-Sh/Loom.git?path=Packages/Loom``
+   
    ![安装](Packages/Loom/Documentation~/images/install.png)
+
 2. 在需要在主线程或非主线程中执行的任务上使用Loom提供的API。
+
 3. Loom会根据您选择的API自动将任务委托到相应的线程中执行，并确保数据同步的正确性。
 
 ```csharp
@@ -64,8 +67,11 @@ Loom is a powerful Unity tool designed to simplify multithreading programming an
 ## Installation and Usage
 
 1. In Unity's Package Manager, copy and paste the following link into the input field to complete the installation: ``https://github.com/Bian-Sh/Loom.git?path=Packages/Loom``
+   
    ![Installation](Packages/Loom/Documentation~/images/install.png)
+
 2. Use the provided Loom API on tasks that need to be executed on the main thread or non-main thread.
+
 3. Loom automatically delegates the tasks to the corresponding thread for execution based on the chosen API and ensures the correctness of data synchronization.
 
 ```csharp
