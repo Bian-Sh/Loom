@@ -23,32 +23,28 @@ namespace zFramework.Internal
         {
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             #region 使用 PlayerLoop 在 Unity 主线程的 Update 中更新本任务同步器
-            var loop = new PlayerLoopSystem
-            {
-                type = typeof(Loom),
-                updateDelegate = Update
-            };
             // 为了 ref 而 ref
-            static ref PlayerLoopSystem Find(PlayerLoopSystem[] target, Predicate<PlayerLoopSystem> predicate)
+            static ref PlayerLoopSystem FindSubSystem(PlayerLoopSystem root, Predicate<PlayerLoopSystem> predicate)
             {
-                for (int i = 0; i < target.Length; i++)
+                for (int i = 0; i < root.subSystemList.Length; i++)
                 {
-                    var a = target[i];
-                    if (predicate.Invoke(a))
+                    if (predicate.Invoke(root.subSystemList[i]))
                     {
-                        return ref target[i];
+                        // 可以关注 ref 配合 return 的用法，这样可以直接修改 root.subSystemList[i] 的值
+                        // https://learn.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/ref#ref-returns
+                        return ref root.subSystemList[i];
                     }
                 }
                 throw new Exception("Not Found!");
             }
-            var playerloop = PlayerLoop.GetCurrentPlayerLoop();
-            ref var pls = ref Find(playerloop.subSystemList, v => v.type == typeof(UnityEngine.PlayerLoop.Update));
-            Array.Resize(ref pls.subSystemList, pls.subSystemList.Length + 1);
-            pls.subSystemList[^1] = loop;
-            PlayerLoop.SetPlayerLoop(playerloop);
+            var rootLoopSystem = PlayerLoop.GetCurrentPlayerLoop();
+            ref var sub_pls = ref FindSubSystem(rootLoopSystem, v => v.type == typeof(UnityEngine.PlayerLoop.Update));
+            Array.Resize(ref sub_pls.subSystemList, sub_pls.subSystemList.Length + 1);
+            sub_pls.subSystemList[^1] = new PlayerLoopSystem { type = typeof(Loom), updateDelegate = Update };
+            PlayerLoop.SetPlayerLoop(rootLoopSystem);
 
 #if UNITY_EDITOR
-            //4. 已知：编辑器停止 Play 我们自己插入的 loop 依旧会触发，进入或退出Play 模式先清空 tasks
+            //因为编辑器停止播放后上面插入的 loopsystem 依旧会触发，进入或退出Play 模式先清空 tasks
             EditorApplication.playModeStateChanged -= EditorApplication_playModeStateChanged;
             EditorApplication.playModeStateChanged += EditorApplication_playModeStateChanged;
             static void EditorApplication_playModeStateChanged(PlayModeStateChange obj)
@@ -63,7 +59,7 @@ namespace zFramework.Internal
         }
 
 #if UNITY_EDITOR
-        //5. 确保编辑器下推送的事件也能被执行
+        // 确保编辑器下推送的事件也能被执行
         [InitializeOnLoadMethod]
         static void EditorForceUpdate()
         {
@@ -134,7 +130,7 @@ namespace zFramework.Internal
             public Awaiter GetAwaiter() => new();
             public struct Awaiter : ICriticalNotifyCompletion
             {
-                static readonly WaitCallback switchToCallback = state=>((Action)state).Invoke();
+                static readonly WaitCallback switchToCallback = state => ((Action)state).Invoke();
                 public bool IsCompleted => false;
                 public void GetResult() { }
                 public void OnCompleted(Action continuation) => ThreadPool.UnsafeQueueUserWorkItem(switchToCallback, continuation);
