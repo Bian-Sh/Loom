@@ -34,6 +34,11 @@ Loom.Post(() =>
     Debug.Log($"使用Post线程 ID={Thread.CurrentThread.ManagedThreadId}");
 });
 ```
+**友情提示：** 
+
+* 在循环体内请避免使用 ``await Loom.ToMainTread`` 或者 ``await Loom.ToOhterThread`` ，因为这个动作会导致循环体最终变为 **MainThread** 上下文 或者 **OtherTread** 上下文。
+
+* 在循环体内，你可以使用 Post（xxx） 。
 
 ## 示例应用
 
@@ -88,6 +93,11 @@ Loom.Post(() =>
     Debug.Log($"Use Post Thread ID ={Thread.CurrentThread.ManagedThreadId}");
 });
 ```
+
+**Tips:** 
+* Please avoid using "await Loom.ToMainTread" or "await Loom.ToOhterThread" in the loop body, as this action will cause the loop body to eventually become the **MainThread** context or **OtherTread** context. 
+
+* In the loop body, you can use Post(xxx).
 
 ## Example Applications
 
